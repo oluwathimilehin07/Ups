@@ -102,9 +102,19 @@
                 <a href="#" onclick="showPage('support')" id="nav-support" class="nav-link hover:text-ups-gold transition-colors">Support</a>
             </div>
             <div class="flex items-center space-x-4">
-                <i data-lucide="search" class="w-5 h-5 cursor-pointer hover:text-ups-gold"></i>
+                <i data-lucide="search" class="w-5 h-5 cursor-pointer hover:text-ups-gold hidden sm:block"></i>
                 <i data-lucide="user" class="w-5 h-5 cursor-pointer hover:text-ups-gold"></i>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-white">
+                    <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
+                </button>
             </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-ups-brown border-t border-white/10 px-6 py-4 space-y-4">
+            <a href="#" onclick="showPage('shipping'); toggleMobileMenu()" class="block text-white hover:text-ups-gold">Shipping</a>
+            <a href="#" onclick="showPage('home'); toggleMobileMenu()" class="block text-white hover:text-ups-gold">Tracking</a>
+            <a href="#" onclick="showPage('locations'); toggleMobileMenu()" class="block text-white hover:text-ups-gold">Locations</a>
+            <a href="#" onclick="showPage('support'); toggleMobileMenu()" class="block text-white hover:text-ups-gold">Support</a>
         </div>
     </nav>
 
@@ -141,7 +151,7 @@
                 <p class="text-gray-500 mb-6">Start shipping packages today with competitive rates and global reach.</p>
                 <a href="#" class="text-ups-brown font-bold flex items-center gap-2 hover:text-ups-gold">Learn More <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
             </div>
-            <div class="glass-card p-8 rounded-2xl border-2 border-ups-gold relative shadow-xl transform scale-105">
+            <div class="glass-card p-8 rounded-2xl border-2 border-ups-gold relative shadow-xl transform md:scale-105">
                 <span class="absolute -top-4 left-1/2 -translate-x-1/2 bg-ups-gold text-ups-brown text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</span>
                 <div class="w-14 h-14 bg-ups-brown rounded-xl flex items-center justify-center text-ups-gold mb-6">
                     <i data-lucide="map-pin" class="w-8 h-8"></i>
@@ -302,7 +312,7 @@
                                 <i data-lucide="download" class="w-4 h-4"></i> Export
                             </button>
                         </div>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto hidden md:block">
                             <table class="w-full">
                                 <thead>
                                     <tr class="bg-gray-50">
@@ -315,6 +325,10 @@
                                     <!-- Populated by JS -->
                                 </tbody>
                             </table>
+                        </div>
+                        <!-- Mobile History View -->
+                        <div id="history-mobile-body" class="md:hidden divide-y divide-gray-100">
+                            <!-- Populated by JS -->
                         </div>
                         <div class="p-6 bg-gray-50 text-center">
                             <button class="text-ups-brown font-bold text-sm hover:text-ups-gold transition-colors">
@@ -568,6 +582,22 @@
             window.scrollTo(0, 0);
         }
 
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            const isHidden = menu.classList.contains('hidden');
+            
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                menu.classList.add('hidden');
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
+        }
+
         function handleTrack() {
             const input = document.getElementById('tracking-input').value.trim();
             if (input) {
@@ -611,6 +641,25 @@
                 `;
                 historyBody.appendChild(row);
             });
+
+            // Populate Mobile History
+            const historyMobileBody = document.getElementById('history-mobile-body');
+            historyMobileBody.innerHTML = '';
+            shipmentData.history.forEach((entry, index) => {
+                const card = document.createElement('div');
+                card.className = "p-4 space-y-2";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">${entry.date} at ${entry.time}</div>
+                        <div class="text-sm font-semibold ${index === 0 ? 'text-ups-gold' : 'text-ups-brown'}">
+                            ${entry.activity}
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600">${entry.location}</div>
+                `;
+                historyMobileBody.appendChild(card);
+            });
+
             lucide.createIcons();
         }
 

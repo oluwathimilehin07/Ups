@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPS Tracking | Premium Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="ups-logo.png">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ups: {
+                            brown: '#351c15',
+                            gold: '#ffb500',
+                            goldDark: '#e6a400',
+                            neutral: '#f4f4f4',
+                            text: '#242424'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #242424;
+            transition: background-color 0.5s ease;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        }
+        .step-circle {
+            transition: all 0.3s ease;
+        }
+        .step-circle.active {
+            background-color: #ffb500;
+            border-color: #351c15;
+            box-shadow: 0 0 0 4px rgba(255, 181, 0, 0.2);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #351c15 0%, #4a2d24 100%);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(255, 181, 0, 0.4);
+            border-color: #ffb500;
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden { display: none; }
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            color: #ffb500;
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #ffb500;
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-ups-brown text-white py-4 px-6 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
+                <div class="bg-white p-0.5 rounded-sm">
+                    <img src="ups-logo.png" alt="UPS Logo" class="w-10 h-10 object-contain">
+                </div>
+                <span class="text-2xl font-bold tracking-tight">UPS</span>
+            </div>
+            <div class="hidden md:flex space-x-8 font-medium">
+                <a href="#" onclick="showPage('shipping')" id="nav-shipping" class="nav-link hover:text-ups-gold transition-colors">Shipping</a>
+                <a href="#" onclick="showPage('home')" id="nav-home" class="nav-link hover:text-ups-gold transition-colors">Tracking</a>
+                <a href="#" onclick="showPage('locations')" id="nav-locations" class="nav-link hover:text-ups-gold transition-colors">Locations</a>
+                <a href="#" onclick="showPage('support')" id="nav-support" class="nav-link hover:text-ups-gold transition-colors">Support</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <i data-lucide="search" class="w-5 h-5 cursor-pointer hover:text-ups-gold"></i>
+                <i data-lucide="user" class="w-5 h-5 cursor-pointer hover:text-ups-gold"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HOME PAGE VIEW -->
+    <div id="home-view" class="fade-in">
+        <section class="hero-gradient text-white py-20 px-4 relative overflow-hidden">
+            <div class="max-w-4xl mx-auto text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">Track, Ship, and Manage <br><span class="text-ups-gold">at Your Speed.</span></h1>
+                <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">Get real-time updates on your shipments and manage your deliveries with ease.</p>
+                
+                <div class="bg-white p-2 rounded-xl shadow-2xl max-w-2xl mx-auto flex flex-col md:flex-row gap-2">
+                    <div class="flex-1 relative">
+                        <input type="text" id="tracking-input" placeholder="Enter Tracking ID (e.g., 1Z7E4...)" 
+                               class="w-full px-6 py-4 text-ups-brown text-lg font-medium rounded-lg border-2 border-gray-100 outline-none input-focus transition-all">
+                        <i data-lucide="package" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 w-6 h-6"></i>
+                    </div>
+                    <button onclick="handleTrack()" class="bg-ups-gold hover:bg-ups-goldDark text-ups-brown font-black px-10 py-4 rounded-lg transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg">
+                        TRACK
+                    </button>
+                </div>
+                <p class="mt-4 text-sm text-gray-400">Multiple tracking numbers? <a href="#" class="underline hover:text-ups-gold">Track by Reference</a></p>
+            </div>
+            <!-- Decorative Elements -->
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-ups-gold/10 rounded-full blur-3xl"></div>
+            <div class="absolute -top-20 -right-20 w-96 h-96 bg-ups-gold/5 rounded-full blur-3xl"></div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-4 py-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 rounded-2xl hover:border-ups-gold transition-colors group cursor-pointer">
+                <div class="w-14 h-14 bg-ups-brown rounded-xl flex items-center justify-center text-ups-gold mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="box" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-ups-brown">Create a Shipment</h3>
+                <p class="text-gray-500 mb-6">Start shipping packages today with competitive rates and global reach.</p>
+                <a href="#" class="text-ups-brown font-bold flex items-center gap-2 hover:text-ups-gold">Learn More <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            </div>
+            <div class="glass-card p-8 rounded-2xl border-2 border-ups-gold relative shadow-xl transform scale-105">
+                <span class="absolute -top-4 left-1/2 -translate-x-1/2 bg-ups-gold text-ups-brown text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</span>
+                <div class="w-14 h-14 bg-ups-brown rounded-xl flex items-center justify-center text-ups-gold mb-6">
+                    <i data-lucide="map-pin" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-ups-brown">Find a Location</h3>
+                <p class="text-gray-500 mb-6">Drop off or pick up your packages at thousands of convenient UPS points.</p>
+                <a href="#" class="text-ups-brown font-bold flex items-center gap-2 hover:text-ups-gold">Find Nearby <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            </div>
+            <div class="glass-card p-8 rounded-2xl hover:border-ups-gold transition-colors group cursor-pointer">
+                <div class="w-14 h-14 bg-ups-brown rounded-xl flex items-center justify-center text-ups-gold mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="calculator" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-ups-brown">Calculate Time & Cost</h3>
+                <p class="text-gray-500 mb-6">Get accurate pricing and estimated delivery times for your shipments.</p>
+                <a href="#" class="text-ups-brown font-bold flex items-center gap-2 hover:text-ups-gold">Get a Quote <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            </div>
+        </section>
+    </div>
+
+    <!-- TRACKING RESULT VIEW -->
+    <div id="tracking-view" class="hidden fade-in">
+        <main class="max-w-5xl mx-auto px-4 py-8 md:py-12">
+            <!-- Breadcrumbs -->
+            <nav class="flex mb-8 text-sm font-medium text-gray-400">
+                <a href="#" onclick="showPage('home')" class="hover:text-ups-brown">Home</a>
+                <span class="mx-2">/</span>
+                <span class="text-ups-brown">Tracking Detail</span>
+            </nav>
+
+            <!-- Tracking Header -->
+            <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-ups-brown mb-2">Shipment Details</h1>
+                    <p class="text-gray-600 flex items-center gap-2">
+                        Tracking Number: <span class="font-mono font-bold text-ups-brown" id="tracking-number">---</span>
+                        <button onclick="copyTracking()" class="p-1 hover:bg-gray-200 rounded transition-colors" title="Copy to clipboard">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </p>
+                </div>
+                <button onclick="showPage('home')" class="text-ups-brown font-bold flex items-center gap-2 hover:text-ups-gold mb-1">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i> Track another package
+                </button>
+            </div>
+
+            <!-- Main Status Card -->
+            <div class="glass-card rounded-2xl overflow-hidden mb-8">
+                <div class="bg-white p-6 md:p-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                        <div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700 mb-3 animate-pulse-slow">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                                In Transit
+                            </span>
+                            <h2 class="text-4xl font-black text-ups-brown leading-none" id="delivery-day">Friday</h2>
+                            <p class="text-lg text-gray-500 mt-2">Estimated Delivery By <span class="font-semibold text-gray-700" id="delivery-date">---</span></p>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <p class="text-sm uppercase tracking-widest text-gray-400 font-bold">Destined For</p>
+                            <p class="text-xl font-bold text-ups-brown" id="destination-text">---</p>
+                        </div>
+                    </div>
+
+                    <!-- Visual Stepper -->
+                    <div class="relative px-4 pb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <!-- Step 1 -->
+                            <div class="flex flex-col items-center relative z-10 w-1/4">
+                                <div class="step-circle active w-10 h-10 rounded-full flex items-center justify-center border-2 border-ups-brown bg-ups-gold text-ups-brown mb-3">
+                                    <i data-lucide="package" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs md:text-sm font-bold text-ups-brown uppercase">Shipped</span>
+                            </div>
+                            
+                            <!-- Line 1 -->
+                            <div class="absolute top-5 left-[12.5%] right-[62.5%] h-1 bg-ups-gold"></div>
+
+                            <!-- Step 2 -->
+                            <div class="flex flex-col items-center relative z-10 w-1/4">
+                                <div class="step-circle active w-12 h-12 rounded-full flex items-center justify-center border-4 border-ups-gold bg-ups-brown text-ups-gold mb-3 shadow-lg scale-110">
+                                    <i data-lucide="truck" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-xs md:text-sm font-bold text-ups-brown uppercase tracking-tighter text-center">On the Way</span>
+                            </div>
+
+                            <!-- Line 2 -->
+                            <div class="absolute top-5 left-[37.5%] right-[37.5%] h-1 bg-gray-200"></div>
+
+                            <!-- Step 3 -->
+                            <div class="flex flex-col items-center relative z-10 w-1/4">
+                                <div class="step-circle w-10 h-10 rounded-full flex items-center justify-center border-2 border-gray-300 bg-white text-gray-400 mb-3">
+                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs md:text-sm font-medium text-gray-400 uppercase text-center">Out for Delivery</span>
+                            </div>
+
+                            <!-- Line 3 -->
+                            <div class="absolute top-5 left-[62.5%] right-[12.5%] h-1 bg-gray-200"></div>
+
+                            <!-- Step 4 -->
+                            <div class="flex flex-col items-center relative z-10 w-1/4">
+                                <div class="step-circle w-10 h-10 rounded-full flex items-center justify-center border-2 border-gray-300 bg-white text-gray-400 mb-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs md:text-sm font-medium text-gray-400 uppercase">Delivered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Summary Section -->
+                <div class="lg:col-span-1 space-y-8">
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-ups-brown mb-6 flex items-center gap-2">
+                            <i data-lucide="info" class="w-5 h-5 text-ups-gold"></i>
+                            Shipment Information
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500">Service</span>
+                                <span class="font-bold text-ups-brown" id="service-type">---</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500">Weight</span>
+                                <span class="font-bold text-ups-brown" id="shipment-weight">---</span>
+                            </div>
+                            <div class="flex justify-between border-b border-gray-100 pb-3">
+                                <span class="text-gray-500">Total Packages</span>
+                                <span class="font-bold text-ups-brown">1</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 mb-1">Shipping From</p>
+                                <p class="font-bold text-ups-brown">NEW YORK, NY, US</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-ups-brown rounded-2xl p-6 text-white overflow-hidden relative">
+                        <div class="relative z-10">
+                            <h3 class="text-lg font-bold mb-2 text-ups-gold">UPS My Choice®</h3>
+                            <p class="text-sm text-gray-300 mb-4">Manage all your upcoming deliveries and get more control over your shipments.</p>
+                            <button class="bg-ups-gold text-ups-brown px-4 py-2 rounded font-bold text-sm hover:bg-ups-goldDark transition-colors">
+                                Sign Up Free
+                            </button>
+                        </div>
+                        <i data-lucide="shield-check" class="absolute -bottom-4 -right-4 w-24 h-24 text-white/5"></i>
+                    </div>
+                </div>
+
+                <!-- History Section -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card rounded-2xl overflow-hidden">
+                        <div class="px-6 py-4 bg-white border-b border-gray-100 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-ups-brown">Shipping History</h3>
+                            <button class="text-ups-gold font-bold text-sm flex items-center gap-1 hover:underline">
+                                <i data-lucide="download" class="w-4 h-4"></i> Export
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50">
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Date/Time</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Location</th>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Activity</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100" id="history-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-6 bg-gray-50 text-center">
+                            <button class="text-ups-brown font-bold text-sm hover:text-ups-gold transition-colors">
+                                View Full History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SHIPPING VIEW -->
+    <div id="shipping-view" class="hidden fade-in">
+        <section class="hero-gradient text-white py-16 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-4xl font-black mb-4">Ship Your Way</h1>
+                <p class="text-lg text-gray-300">Fast, reliable shipping solutions tailored to your needs.</p>
+            </div>
+        </section>
+        <main class="max-w-7xl mx-auto px-4 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="glass-card p-10 rounded-3xl border-l-8 border-ups-gold">
+                    <h2 class="text-2xl font-bold text-ups-brown mb-6">Standard Shipping</h2>
+                    <p class="text-gray-600 mb-8">Reliable delivery for your everyday shipping needs. Perfect for non-urgent packages.</p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                            1-5 business days delivery
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+                            Free tracking included
+                        </li>
+                    </ul>
+                    <button class="w-full bg-ups-brown text-white py-4 rounded-xl font-bold hover:bg-black transition-colors">Get Started</button>
+                </div>
+                <div class="glass-card p-10 rounded-3xl border-l-8 border-ups-brown">
+                    <h2 class="text-2xl font-bold text-ups-brown mb-6">Express Shipping</h2>
+                    <p class="text-gray-600 mb-8">When it needs to be there yesterday. Next-day and time-definite delivery options.</p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i data-lucide="zap" class="w-5 h-5 text-ups-gold"></i>
+                            Next-day delivery guaranteed
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-700">
+                            <i data-lucide="zap" class="w-5 h-5 text-ups-gold"></i>
+                            Priority handling
+                        </li>
+                    </ul>
+                    <button class="w-full bg-ups-gold text-ups-brown py-4 rounded-xl font-bold hover:bg-ups-goldDark transition-colors">Ship Express</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- LOCATIONS VIEW -->
+    <div id="locations-view" class="hidden fade-in">
+        <main class="max-w-7xl mx-auto px-4 py-16">
+            <div class="flex flex-col md:flex-row gap-12">
+                <div class="w-full md:w-1/3">
+                    <h1 class="text-3xl font-black text-ups-brown mb-6">Find a UPS Location</h1>
+                    <div class="relative mb-8">
+                        <input type="text" placeholder="Enter City or Zip Code" class="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-100 focus:border-ups-gold outline-none transition-all">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:border-ups-gold cursor-pointer transition-all">
+                            <h4 class="font-bold text-ups-brown">The UPS Store #1234</h4>
+                            <p class="text-sm text-gray-500">123 Main St, Effort, PA</p>
+                            <p class="text-xs text-green-600 mt-2 font-bold">Open until 7:00 PM</p>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl shadow-sm border border-gray-100 hover:border-ups-gold cursor-pointer transition-all">
+                            <h4 class="font-bold text-ups-brown">UPS Drop Box</h4>
+                            <p class="text-sm text-gray-500">905 Toll Rd, Effort, PA</p>
+                            <p class="text-xs text-gray-400 mt-2">Available 24/7</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 h-[600px] bg-gray-100 rounded-3xl relative overflow-hidden flex items-center justify-center">
+                    <div class="text-center">
+                        <i data-lucide="map" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+                        <p class="text-gray-400 font-medium">Interactive Map Placeholder</p>
+                    </div>
+                    <!-- Styled Pins -->
+                    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 bg-ups-brown text-white px-3 py-1 rounded-full shadow-xl flex items-center gap-2 animate-bounce">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-ups-gold"></i>
+                        <span class="text-xs font-bold uppercase">UPS Location</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SUPPORT VIEW -->
+    <div id="support-view" class="hidden fade-in">
+        <section class="bg-ups-brown text-white py-20">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h1 class="text-4xl font-black mb-6">How can we help?</h1>
+                <div class="max-w-xl mx-auto relative">
+                    <input type="text" placeholder="Search for help topics..." class="w-full px-12 py-5 rounded-2xl text-ups-brown outline-none text-lg">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-6 h-6"></i>
+                </div>
+            </div>
+        </section>
+        <main class="max-w-7xl mx-auto px-4 py-20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-8">
+                    <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="package" class="w-10 h-10 text-ups-brown"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-ups-brown mb-2">Tracking Help</h3>
+                    <p class="text-gray-500">Understand your status and delivery options.</p>
+                </div>
+                <div class="text-center p-8">
+                    <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="credit-card" class="w-10 h-10 text-ups-brown"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-ups-brown mb-2">Billing & Payments</h3>
+                    <p class="text-gray-500">Manage your invoices and payment methods.</p>
+                </div>
+                <div class="text-center p-8">
+                    <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="truck" class="w-10 h-10 text-ups-brown"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-ups-brown mb-2">Claims & Returns</h3>
+                    <p class="text-gray-500">Start a claim or process a return shipment.</p>
+                </div>
+            </div>
+            <div class="mt-20 glass-card p-12 rounded-3xl text-center">
+                <h2 class="text-2xl font-bold text-ups-brown mb-4">Still need assistance?</h2>
+                <p class="text-gray-500 mb-8">Our customer support team is available via chat, phone, or email.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="bg-ups-gold text-ups-brown px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:bg-ups-goldDark transition-all">
+                        <i data-lucide="message-square" class="w-5 h-5"></i> Live Chat
+                    </button>
+                    <button class="border-2 border-ups-brown text-ups-brown px-8 py-4 rounded-xl font-bold hover:bg-ups-brown hover:text-white transition-all">
+                        Contact Us
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-20">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="bg-white p-0.5 rounded-sm">
+                            <img src="ups-logo.png" alt="UPS Logo" class="w-8 h-8 object-contain">
+                        </div>
+                        <span class="text-xl font-bold tracking-tight text-ups-brown">UPS</span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Delivering what matters since 1907.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-ups-brown mb-4 uppercase text-xs tracking-widest">Our Company</h4>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><a href="#" class="hover:text-ups-gold">About UPS</a></li>
+                        <li><a href="#" class="hover:text-ups-gold">Media Relations</a></li>
+                        <li><a href="#" class="hover:text-ups-gold">Investor Relations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-ups-brown mb-4 uppercase text-xs tracking-widest">Customer Service</h4>
+                    <ul class="text-sm text-gray-500 space-y-2">
+                        <li><a href="#" class="hover:text-ups-gold">Help & Support</a></li>
+                        <li><a href="#" class="hover:text-ups-gold">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-ups-gold">Shipping Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-ups-brown mb-4 uppercase text-xs tracking-widest">Connect</h4>
+                    <div class="flex space-x-4">
+                        <i data-lucide="facebook" class="w-5 h-5 text-gray-400 hover:text-ups-brown cursor-pointer"></i>
+                        <i data-lucide="twitter" class="w-5 h-5 text-gray-400 hover:text-ups-brown cursor-pointer"></i>
+                        <i data-lucide="instagram" class="w-5 h-5 text-gray-400 hover:text-ups-brown cursor-pointer"></i>
+                        <i data-lucide="linkedin" class="w-5 h-5 text-gray-400 hover:text-ups-brown cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-400 text-xs">© 1994-2026 United Parcel Service of America, Inc. All rights reserved.</p>
+                <div class="flex space-x-6 text-xs text-gray-400">
+                    <a href="#" class="hover:text-ups-brown">Privacy Notice</a>
+                    <a href="#" class="hover:text-ups-brown">Terms of Use</a>
+                    <a href="#" class="hover:text-ups-brown">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Data Object
+        const shipmentData = {
+            trackingNumber: '1Z7E4A890394821034',
+            destination: '905 Toll Rd, Effort, PA 18330',
+            status: 'In Transit',
+            service: 'UPS Ground',
+            weight: '12.5 lbs',
+            history: [
+                { date: 'May 12, 2026', time: '2:30 PM', location: 'Philadelphia, PA, US', activity: 'Arrived at Facility' },
+                { date: 'May 12, 2026', time: '9:00 AM', location: 'Secaucus, NJ, US', activity: 'Departed from Facility' },
+                { date: 'May 11, 2026', time: '4:15 PM', location: 'Secaucus, NJ, US', activity: 'Arrived at Facility' },
+                { date: 'May 11, 2026', time: '1:00 PM', location: 'New York, NY, US', activity: 'Shipped' }
+            ]
+        };
+
+        // Logic to calculate Friday of current week
+        function getFridayOfCurrentWeek() {
+            const today = new Date('2026-05-12'); // Current simulated date
+            const dayOfWeek = today.getDay(); // 2 (Tuesday)
+            const diff = 5 - dayOfWeek;
+            const friday = new Date(today);
+            friday.setDate(today.getDate() + diff);
+            
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            return {
+                day: 'Friday',
+                fullDate: friday.toLocaleDateString('en-US', options)
+            };
+        }
+
+        // Navigation Logic
+        function showPage(pageId) {
+            const views = ['home-view', 'tracking-view', 'shipping-view', 'locations-view', 'support-view'];
+            views.forEach(id => document.getElementById(id).classList.add('hidden'));
+            
+            const navLinks = ['nav-home', 'nav-shipping', 'nav-locations', 'nav-support'];
+            navLinks.forEach(id => document.getElementById(id).classList.remove('active'));
+
+            if (pageId === 'home') {
+                document.getElementById('home-view').classList.remove('hidden');
+                document.getElementById('nav-home').classList.add('active');
+            } else if (pageId === 'tracking') {
+                document.getElementById('tracking-view').classList.remove('hidden');
+                document.getElementById('nav-home').classList.add('active');
+            } else if (pageId === 'shipping') {
+                document.getElementById('shipping-view').classList.remove('hidden');
+                document.getElementById('nav-shipping').classList.add('active');
+            } else if (pageId === 'locations') {
+                document.getElementById('locations-view').classList.remove('hidden');
+                document.getElementById('nav-locations').classList.add('active');
+            } else if (pageId === 'support') {
+                document.getElementById('support-view').classList.remove('hidden');
+                document.getElementById('nav-support').classList.add('active');
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        function handleTrack() {
+            const input = document.getElementById('tracking-input').value.trim();
+            if (input) {
+                // In a real app, we'd fetch data for this ID. Here we just show the mock result.
+                populateResult(input);
+                showPage('tracking');
+            } else {
+                alert("Please enter a tracking number.");
+            }
+        }
+
+        function populateResult(id) {
+            const deliveryInfo = getFridayOfCurrentWeek();
+            
+            document.getElementById('tracking-number').textContent = id;
+            document.getElementById('delivery-day').textContent = deliveryInfo.day;
+            document.getElementById('delivery-date').textContent = deliveryInfo.fullDate;
+            document.getElementById('destination-text').textContent = shipmentData.destination;
+            document.getElementById('service-type').textContent = shipmentData.service;
+            document.getElementById('shipment-weight').textContent = shipmentData.weight;
+
+            const historyBody = document.getElementById('history-body');
+            historyBody.innerHTML = ''; // Clear previous
+            shipmentData.history.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-amber-50/30 transition-colors group";
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-bold text-ups-brown">${entry.date}</div>
+                        <div class="text-xs text-gray-400">${entry.time}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-600">${entry.location}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-semibold ${index === 0 ? 'text-ups-gold' : 'text-ups-brown'} flex items-center gap-2">
+                            ${index === 0 ? '<span class="w-1.5 h-1.5 bg-ups-gold rounded-full"></span>' : ''}
+                            ${entry.activity}
+                        </div>
+                    </td>
+                `;
+                historyBody.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        function copyTracking() {
+            const num = document.getElementById('tracking-number').textContent;
+            navigator.clipboard.writeText(num).then(() => {
+                alert("Tracking number copied!");
+            });
+        }
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            showPage('home'); // Set initial state
+            // Allow Enter key in input
+            document.getElementById('tracking-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleTrack();
+            });
+        });
+    </script>
+</body>
+</html>

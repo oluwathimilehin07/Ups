@@ -231,21 +231,21 @@
 
                             <!-- Step 2 -->
                             <div class="flex flex-col items-center relative z-10 w-1/4">
-                                <div class="step-circle active w-12 h-12 rounded-full flex items-center justify-center border-4 border-ups-gold bg-ups-brown text-ups-gold mb-3 shadow-lg scale-110">
-                                    <i data-lucide="truck" class="w-6 h-6"></i>
+                                <div class="step-circle active w-10 h-10 rounded-full flex items-center justify-center border-2 border-ups-brown bg-ups-gold text-ups-brown mb-3">
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
                                 </div>
                                 <span class="text-xs md:text-sm font-bold text-ups-brown uppercase tracking-tighter text-center">On the Way</span>
                             </div>
 
                             <!-- Line 2 -->
-                            <div class="absolute top-5 left-[37.5%] right-[37.5%] h-1 bg-gray-200"></div>
+                            <div class="absolute top-5 left-[37.5%] right-[37.5%] h-1 bg-ups-gold"></div>
 
                             <!-- Step 3 -->
                             <div class="flex flex-col items-center relative z-10 w-1/4">
-                                <div class="step-circle w-10 h-10 rounded-full flex items-center justify-center border-2 border-gray-300 bg-white text-gray-400 mb-3">
-                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                <div class="step-circle active w-12 h-12 rounded-full flex items-center justify-center border-4 border-ups-gold bg-ups-brown text-ups-gold mb-3 shadow-lg scale-110">
+                                    <i data-lucide="map-pin" class="w-6 h-6"></i>
                                 </div>
-                                <span class="text-xs md:text-sm font-medium text-gray-400 uppercase text-center">Out for Delivery</span>
+                                <span class="text-xs md:text-sm font-bold text-ups-brown uppercase text-center">Out for Delivery</span>
                             </div>
 
                             <!-- Line 3 -->
@@ -528,10 +528,11 @@
         const shipmentData = {
             trackingNumber: '1Z7E4A890394821034',
             destination: '905 Toll Rd, Effort, PA 18330',
-            status: 'In Transit',
+            status: 'Out for Delivery',
             service: 'UPS Ground',
             weight: '12.5 lbs',
             history: [
+                { date: 'May 14, 2026', time: '3:45 PM', location: 'Effort, PA, US', activity: 'Arrived at Facility' },
                 { date: 'May 12, 2026', time: '2:30 PM', location: 'Philadelphia, PA, US', activity: 'Arrived at Facility' },
                 { date: 'May 12, 2026', time: '9:00 AM', location: 'Secaucus, NJ, US', activity: 'Departed from Facility' },
                 { date: 'May 11, 2026', time: '4:15 PM', location: 'Secaucus, NJ, US', activity: 'Arrived at Facility' },
@@ -541,16 +542,10 @@
 
         // Logic to calculate Friday of current week
         function getFridayOfCurrentWeek() {
-            const today = new Date('2026-05-12'); // Current simulated date
-            const dayOfWeek = today.getDay(); // 2 (Tuesday)
-            const diff = 5 - dayOfWeek;
-            const friday = new Date(today);
-            friday.setDate(today.getDate() + diff);
-            
-            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            // Updated for the request: Delivered tomorrow (May 15, 2026)
             return {
                 day: 'Friday',
-                fullDate: friday.toLocaleDateString('en-US', options)
+                fullDate: 'May 15, 2026'
             };
         }
 

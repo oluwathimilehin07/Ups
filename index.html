@@ -202,12 +202,12 @@
                 <div class="bg-white p-6 md:p-10">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                         <div>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700 mb-3 animate-pulse-slow">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700 mb-3">
                                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                                In Transit
+                                Delivered
                             </span>
                             <h2 class="text-4xl font-black text-ups-brown leading-none" id="delivery-day">Friday</h2>
-                            <p class="text-lg text-gray-500 mt-2">Estimated Delivery By <span class="font-semibold text-gray-700" id="delivery-date">---</span></p>
+                            <p class="text-lg text-gray-500 mt-2">Delivered At <span class="font-semibold text-gray-700" id="delivery-date">---</span></p>
                         </div>
                         <div class="text-left md:text-right">
                             <p class="text-sm uppercase tracking-widest text-gray-400 font-bold">Destined For</p>
@@ -242,21 +242,21 @@
 
                             <!-- Step 3 -->
                             <div class="flex flex-col items-center relative z-10 w-1/4">
-                                <div class="step-circle active w-12 h-12 rounded-full flex items-center justify-center border-4 border-ups-gold bg-ups-brown text-ups-gold mb-3 shadow-lg scale-110">
-                                    <i data-lucide="map-pin" class="w-6 h-6"></i>
+                                <div class="step-circle active w-10 h-10 rounded-full flex items-center justify-center border-2 border-ups-brown bg-ups-gold text-ups-brown mb-3">
+                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
                                 </div>
                                 <span class="text-xs md:text-sm font-bold text-ups-brown uppercase text-center">Out for Delivery</span>
                             </div>
 
                             <!-- Line 3 -->
-                            <div class="absolute top-5 left-[62.5%] right-[12.5%] h-1 bg-gray-200"></div>
+                            <div class="absolute top-5 left-[62.5%] right-[12.5%] h-1 bg-ups-gold"></div>
 
                             <!-- Step 4 -->
                             <div class="flex flex-col items-center relative z-10 w-1/4">
-                                <div class="step-circle w-10 h-10 rounded-full flex items-center justify-center border-2 border-gray-300 bg-white text-gray-400 mb-3">
-                                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                <div class="step-circle active w-12 h-12 rounded-full flex items-center justify-center border-4 border-ups-gold bg-ups-brown text-ups-gold mb-3 shadow-lg scale-110">
+                                    <i data-lucide="check-circle" class="w-6 h-6"></i>
                                 </div>
-                                <span class="text-xs md:text-sm font-medium text-gray-400 uppercase">Delivered</span>
+                                <span class="text-xs md:text-sm font-bold text-ups-brown uppercase">Delivered</span>
                             </div>
                         </div>
                     </div>
@@ -528,10 +528,11 @@
         const shipmentData = {
             trackingNumber: '1Z7E4A890394821034',
             destination: '905 Toll Rd, Effort, PA 18330',
-            status: 'Out for Delivery',
+            status: 'Delivered',
             service: 'UPS Ground',
             weight: '12.5 lbs',
             history: [
+                { date: 'May 15, 2026', time: '12:30 PM', location: 'Effort, PA, US', activity: 'Delivered' },
                 { date: 'May 14, 2026', time: '3:45 PM', location: 'Effort, PA, US', activity: 'Arrived at Facility' },
                 { date: 'May 12, 2026', time: '2:30 PM', location: 'Philadelphia, PA, US', activity: 'Arrived at Facility' },
                 { date: 'May 12, 2026', time: '9:00 AM', location: 'Secaucus, NJ, US', activity: 'Departed from Facility' },
@@ -542,10 +543,10 @@
 
         // Logic to calculate Friday of current week
         function getFridayOfCurrentWeek() {
-            // Updated for the request: Delivered tomorrow (May 15, 2026)
+            // Updated for the request: Delivered on Friday at 12:30 PM PA time
             return {
                 day: 'Friday',
-                fullDate: 'May 15, 2026'
+                fullDate: 'May 15, 2026 at 12:30 PM EDT'
             };
         }
 
